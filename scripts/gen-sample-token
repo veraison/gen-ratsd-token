@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PS4=""
+
+this_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+top_dir=$(realpath "$this_dir"/..)
+data_dir="$top_dir"/testdata
+
+echo "Generating ratsd-token.cbor..."
+set -x
+
+"$top_dir"/gen-ratsd-token --key "$data_dir"/ec-p256.jwk \
+	--nonce 0123456789abcdef  --output ratsd-token.cbor \
+	cca "application/eat-collection; profile=\"http://arm.com/CCA-SSD/1.0.0\"" testdata/cca-good.cbor \
+	eat-da "application/eat-ucs+json; eat_profile=\"tag:linaro.org,2025:device#1.0.0\"" testdata/da-spdm-good.cbor
+
+{ set +x; } 2>/dev/null
+echo "done."
